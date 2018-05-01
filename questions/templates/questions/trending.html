@@ -1,0 +1,13 @@
+{% if question_list_by_trend %}
+{% for question in question_list_by_trend %}
+<div class="body_div brd" style="width: 20%; border: 1px white;
+                vertical-align: top; padding: 10px; margin: 5px">
+    {{ question.rating }}
+</div>
+<a href="{{ question.get_url }}">
+    <div class="body_div brd" style="width: 50%; padding: 10px; margin: 5px">
+        {{ question }}
+    </div>
+</a>
+{% endfor %}
+{% endif %}

@@ -1,0 +1,9 @@
+dict
+names
+populate*
+__pycache__
+static/user/images/*
+questions/migrations/*py
+.idea
+!questions/migrations/__init__.py
+

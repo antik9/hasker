@@ -1,0 +1,75 @@
+a:focus, a:hover { text-decoration: none; color: #878 }
+a { color: white }
+
+img { border-radius: 20px; }
+
+body {
+    background-color: rgba(0, 0, 15, .8);
+    opacity: 80%; color: white;
+    font-size: 100%
+    }
+
+button:focus {outline:0;}
+
+input[type=text] {
+    width: 70%;
+    height: 4%;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    padding: 10px 20px 10px 20px;
+    }
+
+
+.header_div {
+    display: inline-block;
+    width: 20%;
+    text-align: center;
+    margin: auto;
+    margin-top: 10px;
+    }
+
+.body_div {
+    display: inline-block;
+    text-align: center;
+    margin: auto;
+    }
+
+.brd {
+    background: #445;
+    padding: 3px;
+    margin: 2px;
+    }
+
+.btn_spec {
+    color: white;
+    width: 25%;
+    background-color: #556;
+    border-radius: 12px;
+    border: double 1px;
+    padding: 3% 15%;
+    }
+
+.chosen { border-color:white; }
+
+.not-chosen { border-color:black; }
+
+.hidden { display: none; }
+
+.alert-questions {
+    width: 60%;
+    margin-left: 20%;
+    color: #fff;
+    background-color: #656;
+    border-color: #444;
+    display: none;
+    }
+
+.tag-color { color: #656; }
+.tag-color:hover { color: #989; }
+
+.right-answer { color: white; }
+.no-right-answer { color: #444; }
+
+
+.mark-right-if-it-is {cursor: pointer;}

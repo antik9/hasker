@@ -1,0 +1,27 @@
+{% extends 'questions/base.html' %}
+
+<!--
+###############################################
+        TITLE BLOCK
+###############################################
+-->
+{% block title %} Search {% endblock %}
+
+
+<!--
+###############################################
+       LEFT CONTENT BLOCK
+###############################################
+-->
+
+{% block left_content_data %}
+
+
+
+<div style="margin-top: 40px;"></div>
+<h1> Search result </h1>
+
+<div id="search-render"></div>
+<div id="request-search-get" style="display:none">{{ request.GET.search }}</div>
+
+{% endblock %}
