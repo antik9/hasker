@@ -17,9 +17,14 @@ services:
     image: hasker
     ports:
       - "8000:80"
+    volumes:
+      - static:/opt/hasker/static
+      - logging:/var/log/hasker
     depends_on:
       - db
 
 volumes:
   pg_data: {}
   pg_backups: {}
+  static: {}
+  logging: {}

@@ -100,20 +100,27 @@
             <tr>
                 <td style="width: 30%">YOUR ANSWER</td>
                 <td style="height: 100px; text-align: center">
-                    <input class="btn_spec" style="padding: 10px 50px; margin: 0% 15%;" type="submit" value="Submit"/>
+                    <input class="btn_spec try-answer" style="padding: 10px 50px; margin: 0% 15%;" type="button"
+                           value="Submit"/>
+                    <input class="btn_spec make-answer" style="display: none;" type="submit" value="Submit"/>
                 </td>
             </tr>
 
             <tr>
-                <td> Text </td>
-                <td><textarea name="Text" style="padding: 10px;" maxlength="2000" cols="40" rows="10">
-                </textarea> </td>
+                <td> Text</td>
+                <td><textarea name="Text" style="padding: 10px;" maxlength="2000" cols="40" rows="10" id="id_text">
+                </textarea></td>
             </tr>
             <tr>
                 <td style="height:10px"></td>
             </tr>
 
         </table>
+
+        <div class="alert alert-questions alert-dismissible alert-text-errors">
+            The Text of Answer Is Too Short
+        </div>
+
     </div>
 </form>
 

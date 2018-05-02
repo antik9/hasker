@@ -6,7 +6,7 @@
 
 <div class="header_div" style="width: 70%">
     <div class="header_div">
-        <h1><a style="color: white; text-decoration: none;" href="{% url 'questions:home' %}"> Hasker </a></h1>
+        <h1><a style="color: white; text-decoration: none;" href="{% url 'home' %}"> Hasker </a></h1>
     </div>
     <div class="header_div" style="width: 40%">
         <form method="get" action="{% url 'questions:search' %}">
@@ -18,7 +18,7 @@
 {% if user.is_authenticated %}
 {% load static %}
 <div class="header_div not_chosen" style="width: 12%; margin-top: 2%; margin-bottom: 0%;">
-    <a href="{% url 'questions:settings' %}">
+    <a href="{% url 'settings' %}">
         {% if request.user.userprofile.avatar %}
         <img src="/{{ request.user.userprofile.avatar }}" height="30%" width="40%">
         {% else %}
@@ -27,13 +27,13 @@
     </a>
 </div>
 <div class="header_div not_chosen" style="width: 12%;">
-    <a href="{% url 'questions:do_logout' %}" class="btn_spec"> Sign out </a>
+    <a href="{% url 'do_logout' %}" class="btn_spec"> Sign out </a>
 </div>
 {% else %}
 <div class="header_div not_chosen" style="width: 12%">
-    <a href="{% url 'questions:do_login' %}" class="btn_spec"> Log in </a>
+    <a href="{% url 'do_login' %}" class="btn_spec"> Log in </a>
 </div>
 <div class="header_div not_chosen" style="width: 12%">
-    <a href="{% url 'questions:signup' %}" class="btn_spec"> Sign up </a>
+    <a href="{% url 'signup' %}" class="btn_spec"> Sign up </a>
 </div>
 {% endif %}

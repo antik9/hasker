@@ -13,13 +13,15 @@ psql -U postgres -c "
 			RAISE NOTICE 'User admin has been created';
 		END IF;	
 		IF EXISTS (SELECT 1 FROM pg_database where datname = 'hasker') THEN 
-			RAISE NOTICE 'Database already exists'; 
+			RAISE NOTICE 'Database already exists';
+		ELSE
+		    RAISE NOTICE 'Database does not exist';
 		END IF; 
 	END 
 	\$do\$; 
 	" &> $tempfile;
 
-if [ -z "`grep 'Database already exists' $tempfile`" ]
+if [ "`grep 'Database does not exist' $tempfile`" ]
 then
 	psql -U postgres -c "CREATE DATABASE hasker WITH OWNER admin;"
 	echo 'Database hasker has been created' >> $tempfile

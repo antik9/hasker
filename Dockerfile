@@ -12,16 +12,16 @@ RUN  pip3 install django \
     psycopg2-binary \
     Pillow
 
+EXPOSE 80
+
+ENV DJANGO_ENV=prod
+ENV DOCKER_CONTAINER=1
+
 COPY . /opt/hasker
 
 RUN rm /etc/nginx/sites-enabled/* \
     && cp /opt/hasker/hasker.conf /etc/nginx/sites-available/ \
     && ln -s /etc/nginx/sites-available/hasker.conf /etc/nginx/sites-enabled/hasker.conf
-
-EXPOSE 80
-
-ENV DJANGO_ENV=prod
-ENV DOCKER_CONTAINER=1
 
 WORKDIR /opt/hasker/
 

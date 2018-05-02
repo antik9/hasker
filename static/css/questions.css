@@ -1,7 +1,5 @@
-a:focus, a:hover { text-decoration: none; color: #878 }
 a { color: white }
-
-img { border-radius: 20px; }
+a:focus, a:hover { text-decoration: none; color: #878 }
 
 body {
     background-color: rgba(0, 0, 15, .8);
@@ -10,6 +8,8 @@ body {
     }
 
 button:focus {outline:0;}
+
+img { border-radius: 20px; }
 
 input[type=text] {
     width: 70%;
@@ -20,14 +20,15 @@ input[type=text] {
     padding: 10px 20px 10px 20px;
     }
 
-
-.header_div {
-    display: inline-block;
-    width: 20%;
-    text-align: center;
-    margin: auto;
-    margin-top: 10px;
+.alert-questions {
+    width: 60%;
+    margin-left: 20%;
+    color: #fff;
+    background-color: #656;
+    border-color: #444;
+    display: none;
     }
+
 
 .body_div {
     display: inline-block;
@@ -52,24 +53,22 @@ input[type=text] {
 
 .chosen { border-color:white; }
 
-.not-chosen { border-color:black; }
+.header_div {
+    display: inline-block;
+    width: 20%;
+    text-align: center;
+    margin: auto;
+    margin-top: 10px;
+    }
 
 .hidden { display: none; }
 
-.alert-questions {
-    width: 60%;
-    margin-left: 20%;
-    color: #fff;
-    background-color: #656;
-    border-color: #444;
-    display: none;
-    }
+.mark-right-if-it-is {cursor: pointer;}
+
+.not-chosen { border-color:black; }
+.no-right-answer { color: #444; }
+
+.right-answer { color: white; }
 
 .tag-color { color: #656; }
 .tag-color:hover { color: #989; }
-
-.right-answer { color: white; }
-.no-right-answer { color: #444; }
-
-
-.mark-right-if-it-is {cursor: pointer;}

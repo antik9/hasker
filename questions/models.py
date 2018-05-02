@@ -8,6 +8,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.db import models, transaction
 from django.utils import timezone
 
+# ****************** TEMPLATE EMAIL ******************#
 email_template = "<p>You get a new answer to your question:</p> " \
                  "<p><b>{question_text}</p></b><br>" \
                  "<p>You can go by this link and read an answer:<p>" \
@@ -15,9 +16,11 @@ email_template = "<p>You get a new answer to your question:</p> " \
                  "<p>Hasker©</p><br>"
 
 
+# ********************* CLASSES **********************#
+
 class UserProfile(models.Model):
     """
-    Profile expand user data with avatar image
+    Profile expand User data with avatar image
     """
     user = models.OneToOneField(to=User,
                                 on_delete=models.CASCADE,
@@ -26,12 +29,20 @@ class UserProfile(models.Model):
 
     @staticmethod
     def get_profile(user_id):
+        """
+        :param user_id:
+        :return: user profile for given user id
+        """
         try:
             return UserProfile.objects.get(user_id=user_id)
         except UserProfile.DoesNotExist:
             return UserProfile.objects.create(user_id=user_id)
 
     def update_profile(self, email, avatar):
+        """
+        atomic transaction -> save user's email
+                           -> save avatar in user's profile
+        """
 
         with transaction.atomic():
             if self.user.email != email:
@@ -76,25 +87,24 @@ class Question(models.Model):
     def __str__(self):
         return self.question_title
 
-    def get_url(self):
-        return "/question/" + str(self.id) + "/" + \
-               quote("-".join(self.question_title.split())) + ".html"
-
-    def get_tags(self):
-        return self.question_tags.all()
-
-    def get_avatar(self):
-        avatar = UserProfile.get_profile(self.author.id).avatar
-        if avatar:
-            return '/' + avatar.url
-
     @staticmethod
     def get_trending_question():
+        """
+        :return: settings.TRENDING_BATCH most voted questions
+        """
         question_list = Question.objects.order_by('-rating').all()
         return question_list[:settings.TRENDING_BATCH]
 
     @staticmethod
     def create_question(request):
+        """
+        :param request: HTTP request
+        :return: new question instance
+
+        atomic transaction -> create new_question
+                           -> create tags if they are not exists
+                           -> add all tags to the Question instance
+        """
         with transaction.atomic():
 
             new_question = Question.objects.create(
@@ -104,9 +114,11 @@ class Question(models.Model):
                 pub_date=datetime.datetime.now()
             )
 
+            # Get all tags from request
             tags = set(map(lambda tag: tag.strip(),
                            request.POST.get("tags").split(",")))
 
+            # Save not existing tags and add all tags to new question
             for tag_text in tags:
                 if tag_text:
                     try:
@@ -121,8 +133,15 @@ class Question(models.Model):
 
     @staticmethod
     def get_search_result(request, search_query):
+        """
+        :param request: HTTP request
+        :param search_query: query in string format
+        :return: questions found by search query and page of Paginator
+        """
         questions = Question.objects.all()
         page = request.GET.get('page')
+
+        # Handle tags query
         if search_query[0][:4] == "tag:":
             search_query = search_query[0].split(':')[1]
             try:
@@ -131,11 +150,13 @@ class Question(models.Model):
             except Tag.DoesNotExist:
                 questions = None
 
+        # Handle simple search query
         else:
             for word in search_query:
                 questions = questions.filter(models.Q(question_title__icontains=word) |
                                              models.Q(question_text__icontains=word))
 
+        # Create paginator if there are found questions
         if questions:
             questions = questions.order_by('-rating', '-pub_date')
             paginator = Paginator(questions, settings.SEARCH_BATCH)
@@ -147,6 +168,15 @@ class Question(models.Model):
 
     @staticmethod
     def change_right_answer(answer_id, is_right):
+        """
+        :param answer_id:
+        :param is_right: mark of correct one answer (only one answer can be correct)
+        :return: right answer id or None if there is no right one
+
+        atomic transaction -> if user want to mark answer as correct remove mark
+                              from current right answer
+                           -> change the state of answer with given answer id to opposite
+        """
         try:
             with transaction.atomic():
                 answer = Answer.objects.get(id=answer_id)
@@ -172,20 +202,47 @@ class Question(models.Model):
         except Answer.DoesNotExist:
             pass
 
+    def get_url(self):
+        """
+        :return: url of Question instance
+        """
+        return "/question/" + str(self.id) + "/" + \
+               quote("-".join(self.question_title.split())) + ".html"
+
+    def get_tags(self):
+        """
+        :return: all tags of Question instance
+        """
+        return self.question_tags.all()
+
+    def get_avatar(self):
+        """
+        :return: avatar of author of Question instance
+        """
+        avatar = UserProfile.get_profile(self.author.id).avatar
+        if avatar:
+            return '/' + avatar.url
+
     def was_published_ago(self):
         """
-        :return: string with format 'asked 10 minutes ago' for current question
-        with appropriate time delta
+        :return: string with format 'asked {number} {time period} ago' for current question
+                with appropriate time delta
         """
         template_ago = "asked {delta:.0f} {interval}{plural} ago"
         delta = datetime.datetime.now(tz=timezone.utc) - self.pub_date
 
         def print_date(divisor, interval):
+            """
+            :param divisor:
+            :param interval:
+            :return: formatted string accordingly to template_ago
+            """
             return template_ago.format(
                 delta=delta.total_seconds() // divisor,
                 interval=interval,
                 plural='' if delta.total_seconds() // divisor == 1 else 's')
 
+        # Choose right one time period
         if delta < datetime.timedelta(hours=1):
             return print_date(60, 'minute')
 
@@ -224,6 +281,13 @@ class Answer(models.Model):
 
     @staticmethod
     def create_answer(request, question):
+        """
+        :param request: HTTP request
+        :param question:
+
+        Function creates new answer and if settings.EMAIL_HOST_USER is specified
+        notify author of question with email
+        """
         Answer.objects.create(
             answer_text=request.POST.get('Text'),
             related_question=question,
@@ -231,6 +295,7 @@ class Answer(models.Model):
             pub_date=datetime.datetime.now()
         )
 
+        # Notify author of the question with an email
         if settings.EMAIL_HOST_USER:
             subject, from_email, to = "You get an answer to your question", \
                                       'noreply@hasker.com', question.author.email
@@ -245,10 +310,15 @@ class Answer(models.Model):
 
     @staticmethod
     def get_answers_page(request):
+        """
+        :param request: HTTP request
+        :return: answers, page, the boolean value is authenticated, id of right one answer
+        """
         question_id = request.GET.get("question_id")
         page = request.GET.get("page")
         is_authenticated = request.GET.get('is_authenticated', False)
 
+        # Get answer to the question and then get page accordingly to request
         if not page:
             page = 1
         answers = Answer.objects.filter(
@@ -257,6 +327,7 @@ class Answer(models.Model):
         paginator = Paginator(answers, settings.ANSWERS_BATCH)
         answers = paginator.get_page(page)
 
+        # Get id of right answer to the question
         right_one = None
         for answer in answers:
             if answer.right:
@@ -265,6 +336,9 @@ class Answer(models.Model):
         return answers, page, is_authenticated, right_one
 
     def get_avatar(self):
+        """
+        :return: avatar of author of Answer instance
+        """
         avatar = UserProfile.get_profile(self.author.id).avatar
         if avatar:
             return '/' + avatar.url
@@ -302,10 +376,15 @@ class VoteAnswer(models.Model):
 
 def do_vote(question_or_answer, text_object_id, user_id, vote_status):
     """
-    :param question_or_answer: class of object
-    :param text_object_id: id of answer or question
+    :param question_or_answer:
+        'q' -> Question
+        'a' -> Answer
+    :param text_object_id: id of an answer or a question
     :param user_id:
-    :param vote_status: up or down
+    :param vote_status:
+        'up'   -> raise rating of an object
+        'down' -> decrease rating of an object
+    :return new rating of a question if it has changed or None if not
     """
     object_class = VoteQuestion if question_or_answer == 'q' else VoteAnswer
     result = None
@@ -335,13 +414,20 @@ def do_vote(question_or_answer, text_object_id, user_id, vote_status):
 
 def update_rating(question_or_answer, text_object_id, up_or_down):
     """
-    :param question_or_answer: class of object
-    :param text_object_id: id of answer or question
-    :param up_or_down: vote up or vote down for object
+    :param question_or_answer:
+        'q' -> Question
+        'a' -> Answer
+    :param text_object_id: id of an answer or a question
+    :param up_or_down:
+        'up'   -> raise rating of an object
+        'down' -> decrease rating of an object
     :return: new rating of an object
     """
     object_class = Question if question_or_answer == 'q' else Answer
+
+    # Get an instance
     current_object = object_class.objects.get(id=text_object_id)
     current_object.rating += 1 if up_or_down == "up" else -1
     current_object.save()
+
     return current_object.rating

@@ -135,7 +135,12 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
 
+# Default routes
+
 LOGIN_REDIRECT_URL = '/'
+BASE_URL = 'localhost:8000'
+
+# Configuration of email service
 
 EMAIL_HOST = 'smtp.sendgrid.net'
 EMAIL_HOST_USER = None        # Add your account
@@ -143,9 +148,30 @@ EMAIL_HOST_PASSWORD = None    # Add your password
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
+# Number of batches for paginator for different sections of site
+
 BATCH_ON_PAGE = 8
 SEARCH_BATCH = 8
 ANSWERS_BATCH = 8
 TRENDING_BATCH = 5
 
-BASE_URL = 'localhost:8000'
+# Logging configuration
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/hasker/django.log',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
