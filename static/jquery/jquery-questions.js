@@ -1,4 +1,3 @@
-
 $(document).ready( function() {
 
     $('.vote-btn-question').click(function(){
@@ -57,9 +56,18 @@ $(document).ready( function() {
         $('.make-ask').click();
     });
 
-    $('.make-ask').keypress(function (e) {
-	e.stopPropagation();
-        e.preventDefault();
+    $('#id_title, #id_tags').keypress(function (e) {
+        if (e.keyCode === 10 || e.keyCode === 13) {
+            e.stopPropagation();
+            e.preventDefault();
+            var num_of_tags = $('#Tags').children().first().val().split(',').length;
+            if (num_of_tags > 3) {
+                $(".alert-tags-errors").hide();
+                $('.alert-tags-errors').show('medium');
+                return;
+            };
+            $('.make-ask').click();
+        };
     });
 
     $('.go-to-ask').click(function(e) {
@@ -110,6 +118,8 @@ $(document).ready( function() {
                                     is_authenticated: $( "#is-authenticated" ).html()}, function(data){
              $("#answers-for-question").html(data);
             });
+
+            setTimeout(function(){ $('#answer-form-id').removeClass('hidden');}, 200);
         };
      });
 

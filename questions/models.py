@@ -66,7 +66,7 @@ class Question(models.Model):
     question_text = models.CharField(max_length=2000, null=False, blank=False)
     pub_date = models.DateTimeField('date published', null=False, blank=False)
 
-    question_tags = models.ManyToManyField(to=Tag, null=True, blank=True)
+    question_tags = models.ManyToManyField(to=Tag, blank=False)
 
     author = models.ForeignKey(to=User, on_delete=models.DO_NOTHING,
                                null=False, blank=False)
@@ -108,11 +108,12 @@ class Question(models.Model):
                            request.POST.get("tags").split(",")))
 
             for tag_text in tags:
-                try:
-                    tag = Tag.objects.get(tag_text=tag_text)
-                except Tag.DoesNotExist:
-                    tag = Tag.objects.create(tag_text=tag_text)
-                new_question.question_tags.add(tag)
+                if tag_text:
+                    try:
+                        tag = Tag.objects.get(tag_text=tag_text)
+                    except Tag.DoesNotExist:
+                        tag = Tag.objects.create(tag_text=tag_text)
+                    new_question.question_tags.add(tag)
 
             new_question.save()
 
@@ -230,16 +231,17 @@ class Answer(models.Model):
             pub_date=datetime.datetime.now()
         )
 
-        subject, from_email, to = "You get an answer to your question", \
-                                  'noreply@hasker.com', question.author.email
-        text_content = ''
-        html_content = email_template.format(
-            question_text=question.question_text,
-            link=settings.BASE_URL + question.get_url())
+        if settings.EMAIL_HOST_USER:
+            subject, from_email, to = "You get an answer to your question", \
+                                      'noreply@hasker.com', question.author.email
+            text_content = ''
+            html_content = email_template.format(
+                question_text=question.question_text,
+                link=settings.BASE_URL + question.get_url())
 
-        msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
-        msg.attach_alternative(html_content, "text/html")
-        msg.send()
+            msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
 
     @staticmethod
     def get_answers_page(request):

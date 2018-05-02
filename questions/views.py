@@ -58,7 +58,8 @@ def change_settings(request):
             user_profile.update_profile(request.POST.get("email"),
                                         request.FILES.get("avatar"))
 
-        return render(request, 'questions/settings.html', {'form': form})
+        # return render(request, 'questions/settings.html', {'form': form})
+        return HttpResponseRedirect(reverse_lazy('questions:settings'))
 
 
 @require_GET

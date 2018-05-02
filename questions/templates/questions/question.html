@@ -93,7 +93,7 @@
 <div id="question-id-div" style="display:none">{{ question.id }}</div>
 
 {% if request.user.is_authenticated %}
-<form method="post" action="{{ request.url }}">
+<form method="post" action="{{ request.url }}" id="answer-form-id" class="hidden">
     {% csrf_token %}
     <div style="margin-left: 25%; margin-top: 0px; font-size: 20px; color: #bbc">
         <table width="80%">
