@@ -50,8 +50,6 @@ class GETAnonymousTest(TestCase):
         self.assertEqual(response.status_code, 404)
 
 
-
-
 class POSTAnonymousTest(TestCase):
     """
     Class for test available POST requests for unauthorized user.
@@ -263,7 +261,7 @@ class POSTAuthorizedWithQuestionsTest(TestCase):
     def test_correct_mark_answer(self):
         self.client.login(username=self.user1.username, password='nobodyknows')
 
-        _ = self.client.get(
+        self.client.get(
             '/mark_right_answer/', {'answer_id': self.answer.id,
                                     'is_right': 'true' if self.answer.right else 'false'})
 

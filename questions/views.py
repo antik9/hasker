@@ -10,7 +10,7 @@ from django.views.decorators.http import require_GET
 from django.urls import reverse_lazy
 
 from .forms import AnswerForm, AskForm, QuestionSignUpForm, UserProfileForm
-from .models import do_vote, validate_user_is_author, Answer, Question, UserProfile
+from .models import do_vote, Answer, Question, UserProfile
 
 NOT_FOUND = 404
 

@@ -143,8 +143,8 @@ BASE_URL = 'localhost:8000'
 # Configuration of email service
 
 EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_HOST_USER = None        # Add your account
-EMAIL_HOST_PASSWORD = None    # Add your password
+EMAIL_HOST_USER = None  # Add your account
+EMAIL_HOST_PASSWORD = None  # Add your password
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
