@@ -24,8 +24,6 @@
 <p style="color:red">{{ error }} </p>
 {% endfor %}
 {% endfor %}
-{% elif request.method == 'POST' %}
-<p>Account Successfully Updated</p>
 {% endif %}
 
 <form method="post" action="{% url 'settings' %}" enctype="multipart/form-data">

@@ -1,22 +1,18 @@
 from django.conf import settings
 from django.contrib.auth import logout, views, forms
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, render_to_response
 from django.template.loader import render_to_string
 from django.views import generic
 from django.views.decorators.http import require_GET
 from django.urls import reverse_lazy
 
 from .forms import AnswerForm, AskForm, QuestionSignUpForm, UserProfileForm
-from .models import do_vote, Answer, Question, UserProfile
+from .models import do_vote, validate_user_is_author, Answer, Question, UserProfile
 
-
-class Error404View(generic.TemplateView):
-    """
-    HTTP 404 respond View
-    """
-    template_name = 'questions/404.html'
+NOT_FOUND = 404
 
 
 class IndexView(generic.TemplateView):
@@ -55,16 +51,15 @@ class QuestionsSignUpView(generic.CreateView):
     template_name = 'questions/signup.html'
 
 
+@login_required(redirect_field_name=reverse_lazy('home'), login_url=reverse_lazy('do_login'))
 def ask_question(request):
     """
     :param request: HTTP request
-    :return: if user is not authenticated redirect to home page
+    :return: if user is not authenticated redirect to login page
              in case of GET request user goes to /ask/ page
              in case of POST request user will be redirected to created
                 question page
     """
-    if not request.user.id:
-        return HttpResponseRedirect(reverse_lazy('home'))
     if request.method == 'GET':
         return render(request, 'questions/ask.html', {'form': AskForm})
     if request.method == 'POST':
@@ -72,17 +67,15 @@ def ask_question(request):
         return HttpResponseRedirect(question.get_url())
 
 
+@login_required(redirect_field_name=reverse_lazy('home'), login_url=reverse_lazy('do_login'))
 def change_settings(request):
     """
     :param request: HTTP request
-    :return: if user is not authenticated redirect to home page
+    :return: if user is not authenticated redirect to login page
              in case of GET request user goes to /settings/ page
              in case of POST request new settings will be applied and
                 render in the form or errors will be rendered to the user
     """
-    if not request.user.id:
-        return HttpResponseRedirect(reverse_lazy('home'))
-
     if request.method == 'GET':
         return render(request, 'questions/settings.html', {})
 
@@ -93,8 +86,10 @@ def change_settings(request):
             user_profile = UserProfile.get_profile(user_id=request.user.id)
             user_profile.update_profile(request.POST.get("email"),
                                         request.FILES.get("avatar"))
+            return HttpResponseRedirect(reverse_lazy('settings'))
 
-        return render(request, 'questions/settings.html', {'form': form})
+        else:
+            return render(request, 'questions/settings.html', {'form': form})
 
 
 @require_GET
@@ -119,8 +114,19 @@ def do_user_vote(request):
     """
     if request.GET.get("value"):
         q_or_a, id_, current_rating, up_or_down = request.GET.get("value").split()
+
+        # Check that user do not vote on his or her object
         new_rating = do_vote(q_or_a, id_, request.user.id, up_or_down)
         return HttpResponse(new_rating)
+
+
+def error_404(_):
+    """
+    :return: Template page for every incorrect response and statuc code NOT FOUND
+    """
+    response = render_to_response('questions/404.html', {})
+    response.status_code = NOT_FOUND
+    return response
 
 
 def get_question_info(request, question_id):
@@ -135,7 +141,7 @@ def get_question_info(request, question_id):
         question = Question.objects.get(id=question_id)
 
     except Question.DoesNotExist:
-        return render(request, 'questions/404.html')
+        return error_404('')
 
     if request.method == 'POST':
         Answer.create_answer(request, question)
@@ -184,7 +190,8 @@ def mark_answer(request):
     """
     answer_id = request.GET.get('answer_id')
     is_right = request.GET.get('is_right')
-    last_right_answer = Question.change_right_answer(answer_id, is_right)
+    last_right_answer = Question.change_right_answer(answer_id, is_right,
+                                                     request.user.id)
     return HttpResponse(last_right_answer)
 
 

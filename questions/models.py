@@ -111,7 +111,7 @@ class Question(models.Model):
                 author=request.user,
                 question_title=request.POST.get("title"),
                 question_text=request.POST.get("text"),
-                pub_date=datetime.datetime.now()
+                pub_date=timezone.now()
             )
 
             # Get all tags from request
@@ -167,7 +167,7 @@ class Question(models.Model):
         return questions, page
 
     @staticmethod
-    def change_right_answer(answer_id, is_right):
+    def change_right_answer(answer_id, is_right, user_id):
         """
         :param answer_id:
         :param is_right: mark of correct one answer (only one answer can be correct)
@@ -180,6 +180,11 @@ class Question(models.Model):
         try:
             with transaction.atomic():
                 answer = Answer.objects.get(id=answer_id)
+
+                # Check that user is author of the question
+                if not validate_user_is_author('q', answer.related_question.id, user_id):
+                    return None
+
                 is_right = False if is_right == 'false' else True
 
                 right_answer = None
@@ -292,7 +297,7 @@ class Answer(models.Model):
             answer_text=request.POST.get('Text'),
             related_question=question,
             author=request.user,
-            pub_date=datetime.datetime.now()
+            pub_date=timezone.now()
         )
 
         # Notify author of the question with an email
@@ -386,6 +391,10 @@ def do_vote(question_or_answer, text_object_id, user_id, vote_status):
         'down' -> decrease rating of an object
     :return new rating of a question if it has changed or None if not
     """
+
+    if validate_user_is_author(question_or_answer, text_object_id, user_id):
+        return None
+
     object_class = VoteQuestion if question_or_answer == 'q' else VoteAnswer
     result = None
 
@@ -410,6 +419,20 @@ def do_vote(question_or_answer, text_object_id, user_id, vote_status):
             current_object.save()
 
     return result
+
+
+def validate_user_is_author(question_or_answer, text_object_id, user_id):
+    """
+    :param question_or_answer:
+        'q' -> Question
+        'a' -> Answer
+    :param text_object_id: id of an answer or a question
+    :param user_id:
+    :return: True if user is author or text object else None
+    """
+    object_class = Question if question_or_answer == 'q' else Answer
+    if object_class.objects.get(id=text_object_id).author.id == user_id:
+        return True
 
 
 def update_rating(question_or_answer, text_object_id, up_or_down):

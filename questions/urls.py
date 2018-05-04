@@ -16,5 +16,5 @@ urlpatterns = [
 
     re_path(r'question/(?P<question_id>\d+)/.*\.html',
             views.get_question_info, name="question_info"),
-    re_path(r'.*', views.Error404View.as_view(), name='not_found'),
+    re_path(r'.*', views.error_404, name='not_found'),
 ]
