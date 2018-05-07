@@ -5,7 +5,7 @@ __pycache__
 static/user/images/*
 questions/migrations/*py
 .idea
-prepare-database.sh
+prepare_database.sh
 
 !questions/migrations/__init__.py
 
