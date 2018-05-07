@@ -1,4 +1,5 @@
 import datetime
+
 from urllib.parse import quote
 
 from django.conf import settings
@@ -6,6 +7,7 @@ from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.core.mail import EmailMultiAlternatives
 from django.db import models, transaction
+from django.urls import reverse
 from django.utils import timezone
 
 # ****************** TEMPLATE EMAIL ******************#
@@ -59,7 +61,7 @@ class Tag(models.Model):
     Tag is common topic with which question is associated.
     One question can have zero, one or more tags.
     """
-    tag_text = models.CharField(max_length=30)
+    tag_text = models.CharField(max_length=30, unique=True)
 
     def __str__(self):
         return self.tag_text
@@ -115,8 +117,8 @@ class Question(models.Model):
             )
 
             # Get all tags from request
-            tags = set(map(lambda tag: tag.strip(),
-                           request.POST.get("tags").split(",")))
+            tags = set([tag.strip() for tag in
+                        request.POST.get("tags").split(",")])
 
             # Save not existing tags and add all tags to new question
             for tag_text in tags:
@@ -169,6 +171,7 @@ class Question(models.Model):
     @staticmethod
     def change_right_answer(answer_id, is_right, user_id):
         """
+        :param user_id:
         :param answer_id:
         :param is_right: mark of correct one answer (only one answer can be correct)
         :return: right answer id or None if there is no right one
@@ -185,7 +188,7 @@ class Question(models.Model):
                 if not validate_user_is_author('q', answer.related_question.id, user_id):
                     return None
 
-                is_right = False if is_right == 'false' else True
+                is_right = is_right == 'true'
 
                 right_answer = None
 
@@ -211,8 +214,13 @@ class Question(models.Model):
         """
         :return: url of Question instance
         """
-        return "/question/" + str(self.id) + "/" + \
-               quote("-".join(self.question_title.split())) + ".html"
+        return reverse(
+            'questions:question_info',
+            kwargs={'question_id': self.id,
+                    'question_enc': quote("-".join(self.question_title.split()))})
+
+        # return "/question/" + str(self.id) + "/" + \
+        #        quote("-".join(self.question_title.split())) + ".html"
 
     def get_tags(self):
         """
@@ -227,37 +235,6 @@ class Question(models.Model):
         avatar = UserProfile.get_profile(self.author.id).avatar
         if avatar:
             return '/' + avatar.url
-
-    def was_published_ago(self):
-        """
-        :return: string with format 'asked {number} {time period} ago' for current question
-                with appropriate time delta
-        """
-        template_ago = "asked {delta:.0f} {interval}{plural} ago"
-        delta = datetime.datetime.now(tz=timezone.utc) - self.pub_date
-
-        def print_date(divisor, interval):
-            """
-            :param divisor:
-            :param interval:
-            :return: formatted string accordingly to template_ago
-            """
-            return template_ago.format(
-                delta=delta.total_seconds() // divisor,
-                interval=interval,
-                plural='' if delta.total_seconds() // divisor == 1 else 's')
-
-        # Choose right one time period
-        if delta < datetime.timedelta(hours=1):
-            return print_date(60, 'minute')
-
-        if delta < datetime.timedelta(days=1):
-            return print_date(60 * 60, 'hour')
-
-        if delta < datetime.timedelta(days=366):
-            return print_date(60 * 60 * 24, 'day')
-
-        return print_date(60 * 60 * 24 * 365, 'year')
 
 
 class Answer(models.Model):

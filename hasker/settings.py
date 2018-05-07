@@ -23,14 +23,11 @@ SECRET_KEY = '&&%iyvjl1xcf_6-e_g9+i#yo=y%hkg!cv5_^*vfolu@q2f)pkb'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-if os.getenv('DJANGO_ENV') == 'prod':
-    DEBUG = False
-else:
-    DEBUG = True
+DEBUG = os.getenv('DJANGO_ENV') != 'prod'
 
 # DEBUG = True
 
-ALLOWED_HOSTS = ['0.0.0.0', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['0.0.0.0', 'localhost', '127.0.0.1', 'web', 'web:8000']
 
 # Application definition
 
@@ -38,6 +35,7 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
+    'django.contrib.humanize',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
@@ -157,21 +155,22 @@ TRENDING_BATCH = 5
 
 # Logging configuration
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': '/var/log/hasker/django.log',
+if not DEBUG:
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'file': {
+                'level': 'DEBUG',
+                'class': 'logging.FileHandler',
+                'filename': '/var/log/hasker/django.log',
+            },
         },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
-            'propagate': True,
+        'loggers': {
+            'django': {
+                'handlers': ['file'],
+                'level': 'DEBUG',
+                'propagate': True,
+            },
         },
-    },
-}
+    }

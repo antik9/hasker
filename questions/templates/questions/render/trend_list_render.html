@@ -56,7 +56,8 @@
         <img src="{% static '/incognito.png' %}" height="40px" width="60px">
         {% endif %}
         <p style="margin-top: 10px;">{{ question.author.username }} </p>
-        <p>{{ question.was_published_ago }}</p>
+        {% load humanize %}
+        <p>Asked {{ question.pub_date|naturaltime }}</p>
     </div>
 </div>
 {% endfor %}

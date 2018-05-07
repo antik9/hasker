@@ -1,10 +1,10 @@
+from http import HTTPStatus
+
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.utils import timezone
 
 from .models import Answer, Question, Tag
-
-OK = 200
 
 
 class GETAnonymousTest(TestCase):
@@ -43,7 +43,7 @@ class GETAnonymousTest(TestCase):
 
     def test_search(self):
         response = self.client.get('/search/?search=something')
-        self.assertEqual(response.status_code, OK)
+        self.assertEqual(response.status_code, HTTPStatus.OK.value)
 
     def test_404(self):
         response = self.client.get('/abcdefgh/')
@@ -106,7 +106,7 @@ class GETAuthorizedTest(TestCase):
     def test_ask(self):
         response = self.client.get('/ask/')
 
-        self.assertEqual(response.status_code, OK)
+        self.assertEqual(response.status_code, HTTPStatus.OK.value)
         self.assertContains(response, 'Hasker', html=True)
         self.assertContains(response, 'ASK A QUESTION', html=True)
         self.assertContains(response, 'Tags', html=True)
@@ -114,7 +114,7 @@ class GETAuthorizedTest(TestCase):
     def test_settings(self):
         response = self.client.get('/settings/')
 
-        self.assertEqual(response.status_code, OK)
+        self.assertEqual(response.status_code, HTTPStatus.OK.value)
         self.assertContains(response, 'Hasker', html=True)
         self.assertContains(response, 'SETTINGS', html=True)
         self.assertContains(response, 'Avatar', html=True)

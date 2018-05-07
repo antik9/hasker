@@ -1,9 +1,11 @@
+from http import HTTPStatus
+
 from django.conf import settings
 from django.contrib.auth import logout, views, forms
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render, render_to_response
+from django.http import HttpResponse
+from django.shortcuts import redirect, render, render_to_response
 from django.template.loader import render_to_string
 from django.views import generic
 from django.views.decorators.http import require_GET
@@ -11,8 +13,6 @@ from django.urls import reverse_lazy
 
 from .forms import AnswerForm, AskForm, QuestionSignUpForm, UserProfileForm
 from .models import do_vote, Answer, Question, UserProfile
-
-NOT_FOUND = 404
 
 
 class IndexView(generic.TemplateView):
@@ -64,7 +64,7 @@ def ask_question(request):
         return render(request, 'questions/ask.html', {'form': AskForm})
     if request.method == 'POST':
         question = Question.create_question(request)
-        return HttpResponseRedirect(question.get_url())
+        return redirect(question.get_url())
 
 
 @login_required(redirect_field_name=reverse_lazy('home'), login_url=reverse_lazy('do_login'))
@@ -86,7 +86,7 @@ def change_settings(request):
             user_profile = UserProfile.get_profile(user_id=request.user.id)
             user_profile.update_profile(request.POST.get("email"),
                                         request.FILES.get("avatar"))
-            return HttpResponseRedirect(reverse_lazy('settings'))
+            return redirect(reverse_lazy('settings'))
 
         else:
             return render(request, 'questions/settings.html', {'form': form})
@@ -101,7 +101,7 @@ def do_logout(request):
     logout(request)
     redirect_url = request.META.get("HTTP_REFERER") \
         if request.META.get("HTTP_REFERER") else '/'
-    return HttpResponseRedirect(redirect_url)
+    return redirect(redirect_url)
 
 
 @require_GET
@@ -125,11 +125,11 @@ def error_404(_):
     :return: Template page for every incorrect response and statuc code NOT FOUND
     """
     response = render_to_response('questions/404.html', {})
-    response.status_code = NOT_FOUND
+    response.status_code = HTTPStatus.NOT_FOUND.value
     return response
 
 
-def get_question_info(request, question_id):
+def get_question_info(request, question_id, question_enc):
     """
     :param request: HTTP request
     :param question_id:
@@ -145,7 +145,7 @@ def get_question_info(request, question_id):
 
     if request.method == 'POST':
         Answer.create_answer(request, question)
-        return HttpResponseRedirect(request.path)
+        return redirect(request.path)
 
     return render(request, 'questions/question.html',
                   {'question': question, 'form': AnswerForm})
@@ -216,16 +216,15 @@ def paginate_data(request):
 
     if paginate_by == 'd':
         question_list_by_date = paginator.get_page(page)
-        return HttpResponse(
-            render_to_string('questions/render/date_list_render.html',
-                             {'question_list_by_date': question_list_by_date,
-                              'page': page}))
+        return render(request, 'questions/render/date_list_render.html',
+                      {'question_list_by_date': question_list_by_date,
+                       'page': page})
+
     else:
         question_list_by_trend = paginator.get_page(page)
-        return HttpResponse(
-            render_to_string('questions/render/trend_list_render.html',
-                             {'question_list_by_trend': question_list_by_trend,
-                              'page': page}))
+        return render(request, 'questions/render/trend_list_render.html',
+                      {'question_list_by_trend': question_list_by_trend,
+                       'page': page})
 
 
 @require_GET
