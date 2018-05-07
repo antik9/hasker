@@ -34,8 +34,8 @@ You can choose only one answer as a right one.
 
 On your settings page you can change your email and add avatar to your user profile.
 
-To make a search query you can type keywords separated by space on search input.
-If you want search by tag you can click on tag of a question or type on search input:
+To make a search query you can type keywords separated by space in search input.
+If you want search questions by tag you can click on tag of a question or type in search input:
 ```
 tag:<tag-to-search-for>
 ```
