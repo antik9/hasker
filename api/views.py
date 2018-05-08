@@ -2,16 +2,17 @@ import json
 
 from http import HTTPStatus
 
+from django.core.paginator import Paginator
 from django.http import HttpResponse
 from django.views.decorators.http import require_GET
-from django.core.paginator import Paginator
 
 from .serializers import AnswerSerializer, QuestionSerializer, \
     QuestionBatchSerializer, QuestionTrendingSerializer
+
 from questions.models import Answer, Question
 
 # Get Help from README and returns it on /rest/ uri and
-# all uris that are not present in api/urls.py
+# all uris with prefix /rest/ that are not present in api/urls.py
 
 with open('api/README.md') as readme:
     API_HELP = readme.read()
@@ -20,14 +21,11 @@ with open('api/README.md') as readme:
 # ********************* HANDLERS **********************#
 
 @require_GET
-def get_api_trending(_):
-    questions = Question.get_trending_question()
-    serialized_questions = QuestionTrendingSerializer(questions, many=True)
-    return HttpResponse(json.dumps(serialized_questions.data, indent=4))
-
-
-@require_GET
 def get_api_answers(request):
+    """
+    :param request: HTTP request
+    :return: one page with answers to the question in json format
+    """
     question_id = request.GET.get('question_id')
     if not question_id:
         return HttpResponse(content=json.dumps({"error": "no id in request"}),
@@ -45,23 +43,11 @@ def get_api_answers(request):
 
 
 @require_GET
-def get_api_question(request):
-    question_id = request.GET.get('question_id')
-    if not question_id:
-        return HttpResponse(content=json.dumps({"error": "no id in request"}),
-                            status=HTTPStatus.BAD_REQUEST)
-
-    try:
-        question = Question.objects.get(id=question_id)
-    except Question.DoesNotExist:
-        return HttpResponse(content=json.dumps({"error": "no question with this id"}),
-                            status=HTTPStatus.NOT_FOUND)
-
-    return HttpResponse(json.dumps(QuestionSerializer(question).data, indent=4))
-
-
-@require_GET
 def get_api_index(request):
+    """
+    :param request: HTTP request
+    :return: one page with questions sorted by date or rating in json format
+    """
     paginate_by = request.GET.get('data', 't')
     batch = request.GET.get('batch', 10)
     page = request.GET.get('page', 1)
@@ -87,7 +73,31 @@ def get_api_index(request):
 
 
 @require_GET
+def get_api_question(request):
+    """
+    :param request: HTTP request
+    :return: full information about a question in json format
+    """
+    question_id = request.GET.get('question_id')
+    if not question_id:
+        return HttpResponse(content=json.dumps({"error": "no id in request"}),
+                            status=HTTPStatus.BAD_REQUEST)
+
+    try:
+        question = Question.objects.get(id=question_id)
+    except Question.DoesNotExist:
+        return HttpResponse(content=json.dumps({"error": "no question with this id"}),
+                            status=HTTPStatus.NOT_FOUND)
+
+    return HttpResponse(json.dumps(QuestionSerializer(question).data, indent=4))
+
+
+@require_GET
 def get_api_search(request):
+    """
+    :param request: HTTP request
+    :return: one page with found questions in json format
+    """
     search_query = request.GET.get("search")
 
     if not search_query:
@@ -109,5 +119,18 @@ def get_api_search(request):
 
 
 @require_GET
+def get_api_trending(_):
+    """
+    :return: top 5 questions by rating in json format
+    """
+    questions = Question.get_trending_question()
+    serialized_questions = QuestionTrendingSerializer(questions, many=True)
+    return HttpResponse(json.dumps(serialized_questions.data, indent=4))
+
+
+@require_GET
 def get_api_help(_):
+    """
+    :return: README
+    """
     return HttpResponse(API_HELP)

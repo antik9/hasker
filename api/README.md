@@ -8,12 +8,11 @@ All of them starts with **/rest/** uri path and then you should add necessary pa
 
 If you want to get questions sorted by date or rating you should get index page.
 
-Parameters:
-* page \<int> *page of list of the questions | default = 1*
-* data \<char> *sorting order | default = t | variants:*
-    * d - by date
-    * t - by trend(rating)
-* batch \<int> *number of questions on one page in response | default = 10*
+| Parameters | Type | Description | Default | Required | Variants |
+|:---:|:---:|:---:|:---:|:---:|:---:|
+| page | \<int> | *page of list of the questions* | 1 | F | |
+| data | \<char> | *sorting order* | t | F | d - by date;<br> t - by trend |
+| batch | \<int> | *number of questions on one page in response* | 10 | F | |
 
 #### Example
 
@@ -49,8 +48,9 @@ Parameters:
 
 If you want to get full question you should provide question id.
 
-Parameters:
-* question_id \<int> *id of a question | required*
+| Parameters | Type | Description | Default | Required | Variants |
+|:---:|:---:|:---:|:---:|:---:|:---:|
+| question_id | \<int> | *id of a question* |  | T | |
 
 #### Example
 
@@ -78,10 +78,11 @@ Parameters:
 
 To get answers you should provide question id and also page and batch size.
 
-Parameters:
-* question_id \<int> *id of a question | required*
-* page \<int> *page of list of the questions | default = 1*
-* batch \<int> *number of questions on one page in response | default = 8*
+| Parameters | Type | Description | Default | Required | Variants |
+|:---:|:---:|:---:|:---:|:---:|:---:|
+| question_id | \<int> | *id of a question* | | T | |
+| page | \<int> | *page of list of the questions* | 1 | F | |
+| batch | \<int> | *number of questions on one page in response* | 8 | F | |
 
 #### Example
 
@@ -133,12 +134,11 @@ No parameters.
 
 You can search questions by words presented in the text or title of the question or by tags.
 
-Parameters:
-* page \<int> *page of list of the questions | default = 1*
-* search \<string> *search query | required | variants:*
-    * words separated with white spaces
-    * tag:<your-tag> construction
-* batch \<int> *number of questions on one page in response | default = 10*
+| Parameters | Type | Description | Default | Required | Variants |
+|:---:|:---:|:---:|:---:|:---:|:---:|
+| page | \<int> | *page of list of the questions* | 1 | F | |
+| search | \<string> | *search query* | | T | words separated with white spaces;<br> tag:<your-tag> construction |
+| batch | \<int> | *number of questions on one page in response* | 10 | F | |
 
 #### Example
 
