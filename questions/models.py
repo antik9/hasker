@@ -141,7 +141,8 @@ class Question(models.Model):
         :return: questions found by search query and page of Paginator
         """
         questions = Question.objects.all()
-        page = request.GET.get('page')
+        page = request.GET.get('page', 1)
+        batch = request.GET.get('batch', settings.SEARCH_BATCH)
 
         # Handle tags query
         if search_query[0][:4] == "tag:":
@@ -161,12 +162,10 @@ class Question(models.Model):
         # Create paginator if there are found questions
         if questions:
             questions = questions.order_by('-rating', '-pub_date')
-            paginator = Paginator(questions, settings.SEARCH_BATCH)
-            if not page:
-                page = 1
+            paginator = Paginator(questions, batch)
             questions = paginator.get_page(page)
 
-        return questions, page
+        return questions, questions.number if questions else page
 
     @staticmethod
     def change_right_answer(answer_id, is_right, user_id):
@@ -297,16 +296,15 @@ class Answer(models.Model):
         :return: answers, page, the boolean value is authenticated, id of right one answer
         """
         question_id = request.GET.get("question_id")
-        page = request.GET.get("page")
+        page = request.GET.get("page", 1)
         is_authenticated = request.GET.get('is_authenticated', False)
+        batch = request.GET.get('batch', settings.ANSWERS_BATCH)
 
         # Get answer to the question and then get page accordingly to request
-        if not page:
-            page = 1
         answers = Answer.objects.filter(
             related_question_id=question_id).order_by('-rating')
 
-        paginator = Paginator(answers, settings.ANSWERS_BATCH)
+        paginator = Paginator(answers, batch)
         answers = paginator.get_page(page)
 
         # Get id of right answer to the question

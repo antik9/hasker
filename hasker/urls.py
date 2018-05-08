@@ -8,6 +8,7 @@ urlpatterns = [
     path('', views.IndexView.as_view(), name='home'),
     path('login/', views.QuestionsLoginView.as_view(), name='do_login'),
     path('logout/', views.do_logout, name='do_logout'),
+    path('rest/', include('api.urls')),
     path('signup/', views.QuestionsSignUpView.as_view(), name='signup'),
     path('settings/', views.change_settings, name='settings'),
     path('', include('questions.urls')),
