@@ -11,7 +11,7 @@ If you want to get questions sorted by date or rating you should get index page.
 | Parameters | Type | Description | Default | Required | Variants |
 |:---:|:---:|:---:|:---:|:---:|:---:|
 | page | \<int> | *page of list of the questions* | 1 | F | |
-| data | \<char> | *sorting order* | t | F | d - by date;<br> t - by trend |
+| data | \<char> | *sorting order* | t | F | d - by date<br> t - by trend |
 | batch | \<int> | *number of questions on one page in response* | 10 | F | |
 
 #### Example
@@ -137,7 +137,7 @@ You can search questions by words presented in the text or title of the question
 | Parameters | Type | Description | Default | Required | Variants |
 |:---:|:---:|:---:|:---:|:---:|:---:|
 | page | \<int> | *page of list of the questions* | 1 | F | |
-| search | \<string> | *search query* | | T | words separated with white spaces;<br> tag:<your-tag> construction |
+| search | \<string> | *search query* | | T | words separated with white spaces<br> tag:\<your-tag> construction |
 | batch | \<int> | *number of questions on one page in response* | 10 | F | |
 
 #### Example

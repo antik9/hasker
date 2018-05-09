@@ -11,6 +11,7 @@ services:
       - pg_data:/var/lib/postgresql/data
       - pg_backups:/pg_backups
     environment:
+      - POSTGRES_DB=hasker
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=admin
 

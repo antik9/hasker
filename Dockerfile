@@ -7,10 +7,12 @@ RUN apt-get update \
 	    python3-pip \
  	    nginx
 
-RUN  pip3 install django \
+RUN pip3 install django \
     uwsgi \
     psycopg2-binary \
-    Pillow
+    Pillow \
+    djangorestframework \
+	djangorestframework-jwt
 
 EXPOSE 8000
 
@@ -21,6 +23,7 @@ COPY . /opt/hasker
 
 WORKDIR /opt/hasker/
 
-ENTRYPOINT python3 manage.py makemigrations \
+ENTRYPOINT sleep 10 \
+    && python3 manage.py makemigrations \
     && python3 manage.py migrate \
     && uwsgi --ini /opt/hasker/uwsgi.ini
