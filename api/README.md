@@ -6,6 +6,8 @@ All of them starts with **/rest/** uri path and then you should add necessary pa
 ### 1. GET index of Hasker Api
 *full path: /rest/index/*
 
+**AUTH NOT REQUIRED**
+
 If you want to get questions sorted by date or rating you should get index page.
 
 | Parameters | Type | Description | Default | Required | Variants |
@@ -46,6 +48,8 @@ If you want to get questions sorted by date or rating you should get index page.
 ### 2. GET full information about a question
 *full path: /rest/question/*
 
+**AUTH REQUIRED**
+
 If you want to get full question you should provide question id.
 
 | Parameters | Type | Description | Default | Required | Variants |
@@ -55,7 +59,7 @@ If you want to get full question you should provide question id.
 #### Example
 
 ```
->>> curl "http://localhost:8000/rest/question/?question_id=253"
+>>> curl -H "Authorization: JWT <your_token>" "http://localhost:8000/rest/question/?question_id=253"
 
 {
     "id": 253,
@@ -76,6 +80,8 @@ If you want to get full question you should provide question id.
 ### 3. GET answers to the question
 *full path: /rest/answers/*
 
+**AUTH REQUIRED**
+
 To get answers you should provide question id and also page and batch size.
 
 | Parameters | Type | Description | Default | Required | Variants |
@@ -87,7 +93,7 @@ To get answers you should provide question id and also page and batch size.
 #### Example
 
 ```
->>> curl "http://localhost:8000/rest/answers/?question_id=243&page=2&batch=3"
+>>> curl -H "Authorization: JWT <your_token>" "http://localhost:8000/rest/answers/?question_id=243&page=2&batch=3"
 
 {
     "question_id": "243",
@@ -108,6 +114,8 @@ To get answers you should provide question id and also page and batch size.
 
 ### 4. GET trending questions
 *full path: /rest/trending/*
+
+**AUTH NOT REQUIRED**
 
 By this request you can get top 5 questions by rating.
 
@@ -132,6 +140,8 @@ No parameters.
 ### 5. GET search request
 *full path: /rest/search/*
 
+**AUTH REQUIRED**
+
 You can search questions by words presented in the text or title of the question or by tags.
 
 | Parameters | Type | Description | Default | Required | Variants |
@@ -143,7 +153,7 @@ You can search questions by words presented in the text or title of the question
 #### Example
 
 ```
->>> curl "http://localhost:8000/rest/search/search=?tag:prisoner"
+>>> curl -H "Authorization: JWT <your_token>" "http://localhost:8000/rest/search/search=?tag:prisoner"
 
 {
     "page": 1,

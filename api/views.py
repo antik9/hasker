@@ -6,6 +6,9 @@ from django.core.paginator import Paginator
 from django.http import HttpResponse
 from django.views.decorators.http import require_GET
 
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+
 from .serializers import AnswerSerializer, QuestionSerializer, \
     QuestionBatchSerializer, QuestionTrendingSerializer
 
@@ -20,7 +23,8 @@ with open('api/README.md') as readme:
 
 # ********************* HANDLERS **********************#
 
-@require_GET
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
 def get_api_answers(request):
     """
     :param request: HTTP request
@@ -72,7 +76,8 @@ def get_api_index(request):
         }, indent=4))
 
 
-@require_GET
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
 def get_api_question(request):
     """
     :param request: HTTP request
@@ -92,7 +97,8 @@ def get_api_question(request):
     return HttpResponse(json.dumps(QuestionSerializer(question).data, indent=4))
 
 
-@require_GET
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
 def get_api_search(request):
     """
     :param request: HTTP request
@@ -123,6 +129,7 @@ def get_api_trending(_):
     """
     :return: top 5 questions by rating in json format
     """
+
     questions = Question.get_trending_question()
     serialized_questions = QuestionTrendingSerializer(questions, many=True)
     return HttpResponse(json.dumps(serialized_questions.data, indent=4))
