@@ -5,7 +5,7 @@ verify_ssl = true
 [packages]
 dj-database-url = "*"
 django = "*"
-uwsgi = "*"
+gunicorn = "*"
 psycopg2-binary = "*"
 whitenoise = "*"
 Pillow = "*"
