@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 
 import datetime
 import os
+import sys
 
 import django_heroku
 
@@ -30,7 +31,8 @@ DEBUG = os.getenv('DJANGO_ENV') != 'prod'
 
 # DEBUG = True
 
-ALLOWED_HOSTS = ['0.0.0.0', 'localhost', '127.0.0.1', 'web', 'web:8000']
+ALLOWED_HOSTS = ['0.0.0.0', 'localhost', '127.0.0.1', 'web', 'web:8000', 
+        'https://morning-escarpment-46930.herokuapp.com']
 
 # Application definition
 
@@ -174,17 +176,10 @@ if not DEBUG:
         'version': 1,
         'disable_existing_loggers': False,
         'handlers': {
-            'file': {
-                'level': 'DEBUG',
-                'class': 'logging.FileHandler',
-                'filename': '/var/log/hasker/django.log',
-            },
-        },
-        'loggers': {
-            'django': {
-                'handlers': ['file'],
-                'level': 'DEBUG',
-                'propagate': True,
+            'console': {
+                'level': 'INFO',
+                'class': 'logging.StreamHandler',
+                'strm': sys.stdout,
             },
         },
     }
