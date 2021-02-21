@@ -5,7 +5,7 @@ from django.contrib.auth import logout, views, forms
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.http import HttpResponse
-from django.shortcuts import redirect, render, render_to_response
+from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
 from django.views import generic
 from django.views.decorators.http import require_GET
@@ -124,7 +124,8 @@ def error_404(_):
     """
     :return: Template page for every incorrect response and statuc code NOT FOUND
     """
-    response = render_to_response('questions/404.html', {})
+
+    response = HttpResponse(render_to_string('questions/404.html', {}))
     response.status_code = HTTPStatus.NOT_FOUND.value
     return response
 
