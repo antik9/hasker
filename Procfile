@@ -1,1 +1,1 @@
-web: gunicorn hasker.wsgi
+web: gunicorn -w5 hasker.wsgi
